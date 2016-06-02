@@ -14,25 +14,10 @@ public class UZPageSteps {
 
     WebDriver driver = new FirefoxDriver();
     Robot robot = new Robot();
-    WebDriverWait wait = new WebDriverWait(driver, 5);
-
-    public void goToLoginPage(String URL){
-        driver.get(URL);
-    }
+    WebDriverWait wait = new WebDriverWait(driver, 10);
 
     public void exit(){
         driver.close();
-        //System.exit(0);
-    }
-
-    public void loginAsUser(String userName, String password){
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[name=login]")));
-        driver.findElement(By.cssSelector("input[name=login]")).sendKeys(userName);
-        robot.keyPress(KeyEvent.VK_TAB);
-        robot.keyRelease(KeyEvent.VK_TAB);
-        driver.findElement(By.cssSelector("input[name=passwd]")).sendKeys(password);
-        driver.findElement(By.cssSelector("button[class=button]")).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Выйти')]")));
     }
 
     public void goToOrderPage(String OrderURL){
@@ -41,6 +26,7 @@ public class UZPageSteps {
 
     public boolean searchTrain(String from, String till, String date) throws InterruptedException {
         boolean localResult = false;
+        // input station_from
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[name=station_from]")));
         driver.findElement(By.cssSelector("input[name=station_from]")).sendKeys(from);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[id=stations_from][style*=visible]")));
@@ -49,6 +35,7 @@ public class UZPageSteps {
         robot.keyPress(KeyEvent.VK_ENTER);
         robot.keyRelease(KeyEvent.VK_ENTER);
 
+        // input station_till
         driver.findElement(By.cssSelector("input[name=station_till]")).sendKeys(till);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[id=stations_till][style*=visible]")));
         robot.keyPress(KeyEvent.VK_DOWN);
@@ -56,13 +43,17 @@ public class UZPageSteps {
         robot.keyPress(KeyEvent.VK_ENTER);
         robot.keyRelease(KeyEvent.VK_ENTER);
 
+        // input date
         driver.findElement(By.id("date_dep")).clear();
         driver.findElement(By.id("date_dep")).sendKeys(date);
         driver.findElement(By.className("main-news")).click();
 
+        // click button and wait loading
         driver.findElement(By.cssSelector("button[name=search]")).click();
-        Thread.sleep(6000);
+        //wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[id=loading_img][style*=visible]")));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("div[id=loading_img][style*=visible]")));
 
+        // looking at the result
         try {
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ts_res_not_found")));
         } catch (TimeoutException e){
@@ -73,7 +64,7 @@ public class UZPageSteps {
 
     }
 
-    public void sendMessageToPhone(String smsSiteURL, String phoneNumber, String password, String messageText){
+    public void sendSmsFromSite(String smsSiteURL, String phoneNumber, String password, String messageText){
         driver.get(smsSiteURL);
 
         driver.findElement(By.cssSelector("input[name=user_phone]")).sendKeys(phoneNumber);
